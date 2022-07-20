@@ -52,10 +52,15 @@ module.exports = {
         const token = jwt.sign({
             userId: user._id.toString(),
             email: user.email
-        }, 'supersecretsigningtoken', { expiresIn: '1h' });
+        }, 'somesupersecretsecret', { expiresIn: '1h' });
         return { token: token, userId: user._id.toString() };
     },
     createPost: async function ({ postInput }, req) {
+        if (!req.isAuth) {
+            const error = new Error('User is not authenticated');
+            error.code = 401;
+            throw error;
+        }
         const errors = [];
         if (validator.isEmpty(postInput.title) || !validator.isLength(postInput.title, { min: 5 })) {
             errors.push({ message: 'Title is invalid' });
@@ -69,12 +74,21 @@ module.exports = {
             error.code = 422;
             throw error;
         }
+        const user = await User.findById(req.userId);
+        if (!user) {
+            const error = new Error('Invalid user');
+            error.code = 401;
+            throw error;
+        }
         const post = new Post({
             title: postInput.title,
             content: postInput.content,
-            imageUrl: postInput.imageUrl
+            imageUrl: postInput.imageUrl,
+            creator: user
         });
         const createdPost = await post.save();
+        user.posts.push(createdPost);
+        await users.save();
         return { ...createdPost._doc, _id: createdPost._id.toString(), createdAt: createdPost.createdAt.toISOString(), updatedAt: createdPost.updatedAt.toISOString() };
     }
 };
