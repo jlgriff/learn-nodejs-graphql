@@ -91,14 +91,20 @@ module.exports = {
         await users.save();
         return { ...createdPost._doc, _id: createdPost._id.toString(), createdAt: createdPost.createdAt.toISOString(), updatedAt: createdPost.updatedAt.toISOString() };
     },
-    posts: async function (args, req) {
+    posts: async function ({ page, perPage }, req) {
         if (!req.isAuth) {
             const error = new Error('User is not authenticated');
             error.code = 401;
             throw error;
         }
+        if (!page) {
+            page = 1;
+        }
+        if (!perPage) {
+            perPage = 5;
+        }
         const totalPosts = await Post.find().countDocuments();
-        const posts = await Post.find().sort({ createdAt: -1 }).populate('creator');
+        const posts = await Post.find().sort({ createdAt: -1 }).skip((page - 1) * perPage).limit(perPage).populate('creator');
         return {
             posts: posts.map(post => {
                 return { ...post._doc, _id: post._id.toString(), createdAt: post.createdAt.toISOString(), updatedAt: post.updatedAt.toISOString() };
