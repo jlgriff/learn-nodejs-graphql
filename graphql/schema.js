@@ -6,10 +6,6 @@ module.exports = buildSchema(`
         views: Int!
     }
 
-    type RootQuery {
-        hello: TestData!
-    }
-
     type Post {
         _id: ID!
         title: String!
@@ -33,6 +29,10 @@ module.exports = buildSchema(`
         email: String!
         name: String!
         password: String!
+    }
+
+    type RootQuery {
+        hello: TestData!
     }
 
     type RootMutation {

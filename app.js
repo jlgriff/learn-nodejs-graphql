@@ -50,7 +50,8 @@ app.use((req, res, next) => {
 
 app.use('/graphql', graphqlHTTP({
   schema: graphqlSchema,
-  rootValue: graphqlResolver
+  rootValue: graphqlResolver,
+  graphiql: true, // Allows the graphiql GUI when opening /graphql in the browser
 }));
 
 app.use((error, req, res, next) => {
