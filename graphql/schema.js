@@ -46,5 +46,18 @@ module.exports = buildSchema(`
 `);
 
 /*
-{ "query": "{ hello { text views } }" }
+
+mutation {
+  createUser(userInput: {email: "test1test.com", name: "John", password: "tes1"}) {
+    _id
+    email
+  }
+}
+
+{
+  login(email: "test@test.com", password: "test1") {
+    token
+    userId
+  }
+}
 */
